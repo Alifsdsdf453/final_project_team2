@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 # Category model
 class Category(models.Model):
@@ -51,6 +52,15 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} - {self.customer}"
+
+
+class CustomUser(AbstractUser):
+    ROLE_CHOICES = [
+        ('admin', 'Admin'),
+        ('seller', 'Seller'),
+        ('customer', 'Customer')
+    ]
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
 
 # OrderItem model
 class OrderItem(models.Model):
