@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import Category, Product, Customer, Order, OrderItem, CustomUser
-
+from .models import Category, Product, Customer, Order, OrderItem
+from django.auth.contrib.models import User
 
 # Category Serializer
 class CategorySerializer(serializers.ModelSerializer):
@@ -21,7 +21,6 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'price', 'category',
             'category_detail', 'stock_quantity', 'is_available', 'image_url'
         ]
-        read_only_fields = ['stock_quantity']
 
     def validate_price(self, value):
         if value <= 0:
@@ -33,14 +32,14 @@ class ProductSerializer(serializers.ModelSerializer):
 # User Serializer (CustomUser)
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
-        fields = ['id', 'username', 'email', 'role']
+        model = User
+        fields = ['id', 'username','email', 'password']
 
 
 
 # Customer Registration Serializer
 class CustomerRegistrationSerializer(serializers.ModelSerializer):
-    user = UserSerializer()  # ربط مع CustomUser
+    user = UserSerializer()
 
     class Meta:
         model = Customer
@@ -53,16 +52,16 @@ class CustomerRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        # إنشاء المستخدم أولاً
-        user = CustomUser.objects.create_user(
+        password = user_data.get('password')
+        user = User.objects.create_user(
             username=user_data['username'],
             email=user_data['email'],
-            password=user_data.get('password', 'defaultpassword'),  # يمكن تعديلها
-            role=user_data['role']
+            password=password,
+
         )
 
         # إنشاء Customer وربطه بالمستخدم
-        customer = Customer.objects.create(user=user, **validated_data)
+        customer = User.objects.create(user=user, **validated_data)
         return customer
 
 

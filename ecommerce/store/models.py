@@ -54,14 +54,6 @@ class Order(models.Model):
         return f"Order {self.id} - {self.customer}"
 
 
-class CustomUser(AbstractUser):
-    ROLE_CHOICES = [
-        ('admin', 'Admin'),
-        ('seller', 'Seller'),
-        ('customer', 'Customer')
-    ]
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-
 # OrderItem model
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
